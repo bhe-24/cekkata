@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analisis Kata Bahasa Indonesia</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 700px;
+            width: 100%;
+            background: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #444;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        #wordInput {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        #analyzeBtn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        #analyzeBtn:hover {
+            background-color: #0056b3;
+        }
+        .result-card {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            margin-top: 20px;
+            display: none; /* Initially hidden */
+        }
+        .result-card h2 {
+            margin-top: 0;
+            color: #007bff;
+        }
+        .result-card p {
+            font-size: 1.1em;
+            margin: 5px 0;
+        }
+        .explanation {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .explanation h3 {
+            color: #444;
+        }
+        .explanation ul {
+            padding-left: 20px;
+        }
+        .explanation li {
+            margin-bottom: 10px;
+        }
+        .disclaimer {
+            font-size: 0.9em;
+            color: #666;
+            text-align: center;
+            margin-top: 20px;
+        }
+        code {
+            background-color: #e8e8e8;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Analisis Morfologi Kata Indonesia</h1>
+        <p>Masukkan sebuah kata untuk menganalisis kelas katanya (Nomina/Verba) dan proses pembentukannya (Derivasi/Infleksi).</p>
+        
+        <div class="input-group">
+            <input type="text" id="wordInput" placeholder="Contoh: makanan, membaca, dibaca...">
+            <button id="analyzeBtn">Analisis</button>
+        </div>
+
+        <div id="result" class="result-card">
+            <h2>Hasil Analisis</h2>
+            <p><strong>Kata:</strong> <span id="resWord"></span></p>
+            <p><strong>Kelas Kata:</strong> <span id="resClass"></span></p>
+            <p><strong>Proses:</strong> <span id="resProcess"></span></p>
+            <p><strong>Penjelasan:</strong> <span id="resExplanation"></span></p>
+        </div>
+
+        <div class="explanation">
+            <h3>Penjelasan Konsep</h3>
+            <ul>
+                <li><strong>Nomina (Kata Benda):</strong> Kata yang mengacu pada orang, tempat, benda, atau konsep. Contoh: <code>buku</code>, <code>kebaikan</code>, <code>pelari</code>.</li>
+                <li><strong>Verba (Kata Kerja):</strong> Kata yang menyatakan tindakan, keberadaan, atau pengalaman. Contoh: <code>makan</code>, <code>berlari</code>, <code>tertidur</code>.</li>
+                <li><strong>Derivasi:</strong> Proses pembentukan kata baru yang <strong>mengubah kelas kata</strong> atau makna inti dari kata dasarnya. Contoh: kata kerja <code>baca</code> + awalan <code>pe-</code> menjadi kata benda <code>pembaca</code>.</li>
+                <li><strong>Infleksi:</strong> Proses pembentukan kata yang <strong>tidak mengubah kelas katanya</strong>, hanya menambahkan informasi gramatikal seperti modus pasif, kepemilikan, dll. Contoh: kata kerja <code>baca</code> + awalan <code>di-</code> menjadi <code>dibaca</code> (tetap kata kerja, bentuk pasif).</li>
+            </ul>
+        </div>
+        
+        <p class="disclaimer">
+            *Alat ini menggunakan analisis berbasis aturan sederhana dan bukan kamus lengkap, sehingga akurasinya mungkin terbatas pada contoh-contoh umum.
+        </p>
+    </div>
+
+    <script>
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const wordInput = document.getElementById('wordInput');
+        const resultDiv = document.getElementById('result');
+
+        // Simple database for base words
+        const baseWords = {
+            'makan': { class: 'Verba', type: 'Dasar' },
+            'minum': { class: 'Verba', type: 'Dasar' },
+            'baca': { class: 'Verba', type: 'Dasar' },
+            'tulis': { class: 'Verba', type: 'Dasar' },
+            'lari': { class: 'Verba', type: 'Dasar' },
+            'duduk': { class: 'Verba', type: 'Dasar' },
+            'tidur': { class: 'Verba', type: 'Dasar' },
+            'buku': { class: 'Nomina', type: 'Dasar' },
+            'meja': { class: 'Nomina', type: 'Dasar' },
+            'rumah': { class: 'Nomina', type: 'Dasar' },
+            'air': { class: 'Nomina', type: 'Dasar' },
+            'sepeda': { class: 'Nomina', type: 'Dasar' },
+            'baik': { class: 'Adjektiva', type: 'Dasar' }
+        };
+
+        function analyzeWord(word) {
+            word = word.toLowerCase().trim();
+            if (!word) return null;
+
+            // Check if it's a known base word
+            if (baseWords[word]) {
+                const baseInfo = baseWords[word];
+                return {
+                    word: word,
+                    class: baseInfo.class,
+                    process: 'Kata Dasar',
+                    explanation: `"${word}" adalah kata dasar tanpa imbuhan.`
+                };
+            }
+
+            // Rule-based analysis for affixes (imbuhan)
+
+            // 1. Konfiks (awalan dan akhiran) - often create nouns
+            if ((word.startsWith('ke') && word.endsWith('an'))) {
+                return {
+                    word: word,
+                    class: 'Nomina',
+                    process: 'Derivasi',
+                    explanation: `Konfiks "ke-an" pada kata "${word}" umumnya membentuk kata benda (Nomina) yang bermakna abstrak, contoh: dari 'baik' menjadi 'kebaikan'.`
+                };
+            }
+            if ((word.startsWith('pe') && word.endsWith('an')) || (word.startsWith('per') && word.endsWith('an'))) {
+                 return {
+                    word: word,
+                    class: 'Nomina',
+                    process: 'Derivasi',
+                    explanation: `Konfiks "pe(r)-an" pada kata "${word}" umumnya membentuk kata benda (Nomina) yang merujuk pada proses atau tempat.`
+                };
+            }
+
+            // 2. Awalan (Prefixes)
+            if (word.startsWith('di')) {
+                return {
+                    word: word,
+                    class: 'Verba',
+                    process: 'Infleksi',
+                    explanation: `Awalan "di-" membentuk verba pasif. Ini adalah proses infleksi karena tidak mengubah kelas kata dari verba dasarnya.`
+                };
+            }
+            if (word.startsWith('me') || word.startsWith('mem') || word.startsWith('men') || word.startsWith('meng') || word.startsWith('meny')) {
+                return {
+                    word: word,
+                    class: 'Verba',
+                    process: 'Derivasi',
+                    explanation: `Awalan "me-" dan variasinya umumnya membentuk kata kerja aktif (Verba). Proses ini dianggap derivasi karena seringkali mengubah kata dasar (misal: nomina) menjadi verba.`
+                };
+            }
+            if (word.startsWith('ber')) {
+                return {
+                    word: word,
+                    class: 'Verba',
+                    process: 'Derivasi',
+                    explanation: `Awalan "ber-" biasanya membentuk kata kerja (Verba) yang berarti 'memakai', 'melakukan', atau 'memiliki'.`
+                };
+            }
+            if (word.startsWith('ter')) {
+                return {
+                    word: word,
+                    class: 'Verba',
+                    process: 'Infleksi/Derivasi',
+                    explanation: `Awalan "ter-" bisa membentuk verba pasif (infleksi, misal: 'terbaca') atau verba yang tidak disengaja (derivasi, misal: 'tertidur').`
+                };
+            }
+             if (word.startsWith('pe') || word.startsWith('pem') || word.startsWith('pen') || word.startsWith('peng') || word.startsWith('peny')) {
+                return {
+                    word: word,
+                    class: 'Nomina',
+                    process: 'Derivasi',
+                    explanation: `Awalan "pe-" dan variasinya umumnya membentuk kata benda (Nomina) yang berarti 'orang yang melakukan' atau 'alat'. Contoh: dari 'lari' menjadi 'pelari'.`
+                };
+            }
+
+            // 3. Akhiran (Suffixes)
+            if (word.endsWith('an') && !word.startsWith('ke')) { // Hindari tumpang tindih dengan ke-an
+                return {
+                    word: word,
+                    class: 'Nomina',
+                    process: 'Derivasi',
+                    explanation: `Akhiran "-an" seringkali membentuk kata benda (Nomina) yang berarti 'hasil dari suatu perbuatan'. Contoh: dari 'makan' menjadi 'makanan'.`
+                };
+            }
+            if (word.endsWith('kan') || word.endsWith('i')) {
+                return {
+                    word: word,
+                    class: 'Verba',
+                    process: 'Derivasi',
+                    explanation: `Akhiran "-kan" atau "-i" biasanya membentuk kata kerja transitif (Verba Kausatif/Lokatif).`
+                };
+            }
+            if (word.endsWith('nya')) {
+                 return {
+                    word: word,
+                    class: 'Nomina',
+                    process: 'Infleksi',
+                    explanation: `Akhiran "-nya" adalah klitik posesif (kepunyaan). Ini adalah infleksi karena tidak mengubah kelas kata dasarnya (biasanya Nomina).`
+                };
+            }
+
+
+            // Fallback if no rules match
+            return {
+                word: word,
+                class: 'Tidak Diketahui',
+                process: 'Tidak Diketahui',
+                explanation: 'Kata ini tidak cocok dengan aturan dasar atau tidak ada dalam daftar kata dasar sederhana kami.'
+            };
+        }
+
+        function displayResult(analysis) {
+            document.getElementById('resWord').textContent = analysis.word;
+            document.getElementById('resClass').textContent = analysis.class;
+            document.getElementById('resProcess').textContent = analysis.process;
+            document.getElementById('resExplanation').textContent = analysis.explanation;
+            resultDiv.style.display = 'block';
+        }
+
+        analyzeBtn.addEventListener('click', () => {
+            const word = wordInput.value;
+            const analysis = analyzeWord(word);
+            if (analysis) {
+                displayResult(analysis);
+            }
+        });
+
+        wordInput.addEventListener('keyup', (event) => {
+            if (event.key === 'Enter') {
+                analyzeBtn.click();
+            }
+        });
+
+    </script>
+
+</body>
+</html>

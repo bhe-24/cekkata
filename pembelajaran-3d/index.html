@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Pembelajaran - Generator 3D</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; padding: 50px; }
+        .card { border: 1px solid #ddd; padding: 20px; border-radius: 8px; max-width: 400px; margin: 0 auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        button { background-color: #0070f3; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; margin-top: 15px; }
+        button:hover { background-color: #005bb5; }
+        #qrcode { margin-top: 20px; display: flex; justify-content: center; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Modul: Pengenalan Rumah Adat</h2>
+        <p>Klik tombol di bawah untuk menghasilkan QR Code akses 3D.</p>
+        <!-- Tombol ini memicu fungsi di app.js -->
+        <button id="generateBtn">Buat QR Code 3D</button>
+        <div id="qrcode"></div>
+        <p id="scanText" style="display: none; color: #666; font-size: 14px;">Scan dengan kamera HP Anda</p>
+    </div>
+
+    <!-- Memuat library qrcode.js dari CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <!-- Memuat skrip lokal kita -->
+    <script src="./js/app.js"></script>
+</body>
+</html>

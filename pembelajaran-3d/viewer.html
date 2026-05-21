@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaksi 3D Pembelajaran</title>
+    <!-- Memuat komponen model-viewer -->
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+    <style>
+        body { margin: 0; padding: 0; background-color: #f0f0f0; display: flex; flex-direction: column; height: 100vh; }
+        model-viewer { width: 100%; height: 70vh; background-color: #ffffff; }
+        .info-panel { padding: 20px; text-align: center; font-family: sans-serif; }
+    </style>
+</head>
+<body>
+    <!-- 
+      Atribut camera-controls mengizinkan geser/putar.
+      Atribut ar memunculkan tombol AR di HP.
+    -->
+    <model-viewer 
+        id="modelDisplay"
+        src="./assets/models/rumah.glb" 
+        alt="Model 3D Interaktif" 
+        camera-controls 
+        auto-rotate 
+        ar>
+    </model-viewer>
+
+    <div class="info-panel">
+        <h2 id="modelTitle">Memuat Data...</h2>
+        <p id="modelDescription">Menunggu penjelasan dari AI...</p>
+        <!-- Tempat untuk kontrol audio nantinya -->
+    </div>
+
+    <script>
+        // Mengambil parameter dari URL (misal: ?model=rumah)
+        const urlParams = new URLSearchParams(window.location.search);
+        const modelId = urlParams.get('model');
+        
+        if(modelId) {
+            document.getElementById('modelTitle').innerText = "Objek: " + modelId.toUpperCase();
+            // Opsional: Ubah sumber model secara dinamis jika Anda memiliki banyak file
+            // document.getElementById('modelDisplay').src = `./assets/models/${modelId}.glb`;
+        }
+    </script>
+</body>
+</html>
